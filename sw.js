@@ -1,5 +1,5 @@
-// MathDrill service worker : hors ligne. Version 76d993ff6a
-var CACHE='mathdrill-76d993ff6a';
+// MathDrill service worker : hors ligne. Version e4466a20be
+var CACHE='mathdrill-e4466a20be';
 var FILES=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png'];
 self.addEventListener('install',function(e){e.waitUntil(caches.open(CACHE).then(function(c){return c.addAll(FILES);}).then(function(){return self.skipWaiting();}));});
 self.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(ks){return Promise.all(ks.filter(function(k){return k!==CACHE;}).map(function(k){return caches.delete(k);}));}).then(function(){return self.clients.claim();}));});

@@ -71,7 +71,9 @@ var ENGINE = (function () {
       var t = traps[i];
       if (isFinite(t.v) && Math.abs(xv - t.v) <= Math.max(1e-6, 0.005 * Math.abs(t.v)) && !within(item, t.v)) return Object.assign(base, { res: "ko", code: t.code, msg: t.msg });
     }
-    return Object.assign(base, { res: "ko", code: "E04", msg: "Écart de " + D.fr((errRel || 0) * 100, 1) + " %. Reprends le calcul étape par étape." });
+    var gap = item.unit === "%" ? "Tu es " + (errSigned > 0 ? "au-dessus" : "en dessous") + " de " + D.fr(Math.abs(errSigned), 1) + " point" + (Math.abs(errSigned) >= 2 ? "s" : "") + "."
+      : "Tu es " + (errSigned > 0 ? "au-dessus" : "en dessous") + " de " + D.fr(Math.abs(errRel || 0) * 100, 0) + " %.";
+    return Object.assign(base, { res: "ko", code: "E04", msg: gap + " Reprends la méthode ci-dessous étape par étape." });
   }
 
   // ---------- mémoire : l'état se déduit entièrement des événements (un seul historique) ----------
