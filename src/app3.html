@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MathDrill</title>
+<meta name="description" content="Entraînement au calcul de case : réflexes du MathBook, mécanismes de case et Deal Valuation.">
+<meta name="theme-color" content="#1f5eff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MathDrill">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+:root{--bg:#f6f5f2;--card:#fff;--ink:#1d1d1f;--mute:#66666c;--line:#e3e1dc;--acc:#1f5eff;--acc-ink:#fff;--ok:#17703f;--ok-bg:#e6f4ec;--ko:#b3261e;--ko-bg:#fbeae8;--tip:#fff7e0;--tip-line:#ecd9a0;--green:#2e9b5f;--orange:#d98a1c;--red:#cc3b30;--grey:#b4b4b9;--key:#ecebe7}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121214;--card:#1d1d20;--ink:#f1f1f3;--mute:#a3a3aa;--line:#323237;--acc:#7099ff;--acc-ink:#0b0b0e;--ok:#5cc98a;--ok-bg:#15301f;--ko:#ff7d71;--ko-bg:#3a1a17;--tip:#2a2513;--tip-line:#5a4c22;--green:#4cc27f;--orange:#f0a640;--red:#ff6b60;--grey:#55555b;--key:#2a2a2e}}
+:root[data-theme="dark"]{--bg:#121214;--card:#1d1d20;--ink:#f1f1f3;--mute:#a3a3aa;--line:#323237;--acc:#7099ff;--acc-ink:#0b0b0e;--ok:#5cc98a;--ok-bg:#15301f;--ko:#ff7d71;--ko-bg:#3a1a17;--tip:#2a2513;--tip-line:#5a4c22;--green:#4cc27f;--orange:#f0a640;--red:#ff6b60;--grey:#55555b;--key:#2a2a2e}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;overflow-x:hidden}
+.wrap{max-width:560px;margin:0 auto;padding:max(10px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(84px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 0 6px}
+h1{font-size:20px;margin:0}
+h2{font-size:17px;margin:18px 0 8px}
+h3{font-size:13px;margin:14px 0 6px;color:var(--mute);text-transform:uppercase;letter-spacing:.04em}
+p{margin:6px 0}
+.small{font-size:13.5px;color:var(--mute)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button{font:inherit;border-radius:11px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 13px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button.pri{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:600}
+button.big{width:100%;padding:14px;font-size:17px}
+button.ghost{background:transparent}
+button.link{border:0;background:none;color:var(--acc);padding:4px 0;text-decoration:underline}
+button:disabled{opacity:.5}
+.seg{display:flex;background:var(--key);border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:transparent;padding:9px 6px;font-weight:600;font-size:15px}
+.seg button.on{background:var(--card);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.save{font-size:12.5px;padding:4px 9px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}
+.save.ok{color:var(--ok);border-color:var(--ok)}
+.save.ko{color:var(--ko);border-color:var(--ko);background:var(--ko-bg)}
+.banner{border-radius:12px;padding:10px 12px;margin:8px 0;font-size:14.5px}
+.banner.ko{background:var(--ko-bg);color:var(--ko);border:1px solid var(--ko)}
+.banner.tip{background:var(--tip);border:1px solid var(--tip-line)}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding:6px max(8px,env(safe-area-inset-left)) calc(6px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-right));z-index:5}
+nav button{flex:1;border:0;background:none;font-size:12.5px;padding:6px 2px;color:var(--mute);display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button svg{width:22px;height:22px}
+nav button.on{color:var(--acc);font-weight:600}
+.hide{display:none!important}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--grey);flex:none}
+.dot.green{background:var(--green)}.dot.orange{background:var(--orange)}.dot.red{background:var(--red)}
+.plist button{display:flex;width:100%;text-align:left;gap:10px;align-items:center;margin:5px 0;padding:11px 12px}
+.plist .nm{flex:1;min-width:0}
+.plist .meta{font-size:12.5px;color:var(--mute)}
+.q{font-size:19px;font-weight:600;margin:6px 0 4px;line-height:1.35}
+.ctx{background:var(--bg);border-radius:10px;padding:10px 12px;font-size:15px;margin:8px 0}
+.topbar{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--mute)}
+.disp{display:flex;align-items:center;gap:8px;background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0 8px;min-height:56px}
+.disp .val{flex:1;font-size:28px;font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.disp .val.empty{color:var(--grey)}
+.disp .u{font-size:17px;color:var(--mute)}
+.units{display:flex;gap:6px;margin:0 0 8px}
+.units button{flex:1;padding:9px 4px;font-weight:600}
+.units button.on{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.pad{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.pad button{background:var(--key);border:0;font-size:23px;font-weight:600;padding:13px 0;border-radius:12px}
+.pad button.op{font-size:19px}
+.pad button.ok{grid-column:4;grid-row:3 / span 2;background:var(--acc);color:var(--acc-ink);font-size:18px}
+.opt{display:block;width:100%;text-align:left;margin:7px 0;font-size:15.5px;padding:12px}
+.opt.good{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+.opt.bad{background:var(--ko-bg);border-color:var(--ko);color:var(--ko)}
+.res{border-radius:14px;padding:12px 14px;margin:10px 0;font-weight:600}
+.res.ok{background:var(--ok-bg);color:var(--ok)}
+.res.ko{background:var(--ko-bg);color:var(--ko)}
+.res .sub{font-weight:400;color:var(--ink);font-size:15px;margin-top:4px}
+.blk{margin:12px 0}
+.blk .lbl{font-size:12.5px;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+ol.steps{margin:4px 0;padding-left:24px}
+ol.steps li{margin:4px 0;font-variant-numeric:tabular-nums}
+.eq{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14.5px;background:var(--bg);border-radius:8px;padding:6px 9px;margin:4px 0;overflow-wrap:anywhere}
+.tip{background:var(--tip);border:1px solid var(--tip-line);border-radius:10px;padding:9px 11px;font-size:15px}
+table.ex{border-collapse:collapse;width:100%;font-size:14px;margin:8px 0}
+table.ex th,table.ex td{border-bottom:1px solid var(--line);padding:6px 5px;text-align:left}
+table.ex td.n,table.ex th.n{text-align:right;font-variant-numeric:tabular-nums}
+.tblwrap{overflow-x:auto}
+details{border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin:8px 0;background:var(--card)}
+details summary{cursor:pointer;font-weight:600}
+.kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kpi div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.kpi b{display:block;font-size:22px}
+.kpi span{font-size:12px;color:var(--mute)}
+textarea{width:100%;min-height:90px;font:14px ui-monospace,Menlo,monospace;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px}
+.tag{display:inline-block;font-size:12px;color:var(--mute);border:1px solid var(--line);border-radius:999px;padding:2px 8px;margin:0 4px 4px 0}
+.check{color:var(--ok);font-weight:700}
+button.len{min-width:52px}
+button.len.on{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><h1 id="ttl">MathDrill</h1><span id="saveBadge" class="save">…</span></header>
+  <div id="storeBanner"></div>
+
+  <!-- ACCUEIL -->
+  <section id="v-home">
+    <div class="seg" id="ctxSeg"><button data-c="metro">Métro · tête seule</button><button data-c="table">Table · avec feuille</button></div>
+    <p class="small" id="ctxHelp"></p>
+    <div id="resumeBox"></div>
+    <button class="pri big" id="goAdaptive">Séance du jour</button>
+    <p class="small" id="dueLine"></p>
+    <div class="row" style="margin-top:6px" id="lenRow"><span class="small">Longueur :</span><button class="len" data-n="5">5</button><button class="len" data-n="10">10</button><button class="len" data-n="15">15</button></div>
+    <div id="tableExtras" class="hide">
+      <h2>Mode Table</h2>
+      <button class="big" id="goChain">Mini-case enchaîné (3 ou 4 questions liées)</button>
+      <button class="big" id="goExhibit" style="margin-top:8px">Lire un tableau</button>
+    </div>
+    <h2>Par thème</h2>
+    <div class="plist" id="famList"></div>
+    <div id="installTip"></div>
+  </section>
+
+  <!-- LISTE D'UN THÈME -->
+  <section id="v-fam" class="hide">
+    <button class="link" data-back="home">‹ Accueil</button>
+    <h2 id="famTitle"></h2><p class="small" id="famSub"></p>
+    <button class="pri big" id="famGo">S'entraîner sur ce thème</button>
+    <div class="plist" id="patList"></div>
+  </section>
+
+  <!-- FICHE D'UN PATTERN -->
+  <section id="v-lesson" class="hide">
+    <button class="link" id="lessonBack">‹ Retour</button>
+    <div id="lessonBody"></div>
+    <button class="pri big" id="lessonGo"></button>
+  </section>
+
+  <!-- PARCOURS DEAL -->
+  <section id="v-deal" class="hide">
+    <h2>Parcours Deal Valuation</h2>
+    <p class="small">Huit modules dans l'ordre. Chacun commence par un cours court (à quoi ça sert, vocabulaire, exemple déroulé, 1 ou 2 questions de compréhension), puis les exercices. Les exercices d'un module n'entrent dans tes séances qu'une fois son cours validé.</p>
+    <div class="plist" id="modList"></div>
+  </section>
+  <section id="v-mod" class="hide">
+    <button class="link" data-back="deal">‹ Parcours Deal</button>
+    <div id="modBody"></div>
+  </section>
+
+  <!-- SÉANCE -->
+  <section id="v-run" class="hide">
+    <div class="topbar"><span id="runPos"></span><span id="clock"></span><button class="link" id="quit">Arrêter</button></div>
+    <div id="runBody"></div>
+  </section>
+
+  <!-- FIN DE SÉANCE -->
+  <section id="v-end" class="hide"><div id="endBody"></div></section>
+
+  <!-- SUIVI -->
+  <section id="v-prog" class="hide"><div id="progBody"></div></section>
+
+  <!-- SAUVEGARDE -->
+  <section id="v-save" class="hide"><div id="saveBody"></div></section>
+</div>
+
+<nav id="nav">
+  <button data-v="home" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Séance</button>
+  <button data-v="deal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5a1 1 0 0 1 1-1h11l4 4v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M8 12h8M8 16h5"/></svg>Deal</button>
+  <button data-v="prog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Suivi</button>
+  <button data-v="save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3h11l3 3v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/><path d="M8 3v5h7V3M8 21v-7h8v7"/></svg>Sauvegarde</button>
+</nav>
+
+<script>
+/*CATALOG*/
+</script>
+<script>
+/*LESSONS*/
+</script>
+<script>
+/*REFLEXES*/
+</script>
+<script>
+/*EXPLAIN*/
+</script>
+<script>
+/*ENGINE*/
+</script>
+<script>
+/*APP*/
+</script>
+</body>
+</html>
