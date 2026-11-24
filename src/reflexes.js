@@ -156,7 +156,7 @@
   def("R24", { name: "Revenir à la base : le % inverse", book: "§14.5", lvl: "B", signal: "Après −20 %, il faut +25 % pour revenir.", trap: "Penser qu'il faut +20 %.", check: "(1 − a) × (1 + b) = 1." },
     { use: "Retrouver un prix ou un CA d'origine, mesurer l'effort pour revenir au niveau d'avant crise.", ex: "Le CA a baissé de 20 % : il doit remonter de 1 ÷ 0,8 − 1 = 25 %.", eq: ["Hausse nécessaire = 1 ÷ (1 − baisse) − 1", "Base = valeur finale ÷ (1 + variation)"] },
     function (r) { var t = r.p([20, 25, 50, 10, 40, 60]), up = (1 / (1 - t / 100) - 1) * 100;
-      return out({ p: { t: t }, q: "Après une baisse de " + t + " %, quelle hausse faut-il pour revenir au niveau de départ ?", ans: up, unit: "%", tol: T.P05, rule: "La hausse se calcule sur une base plus petite : il faut diviser 1 par ce qui reste.",
+      return out({ p: { t: t }, q: "Après une baisse de " + t + " %, quelle hausse faut-il pour revenir au niveau de départ ?", ans: up, unit: "%", tol: T.P1, rule: "La hausse se calcule sur une base plus petite : il faut diviser 1 par ce qui reste.",
         steps: ["Il reste 1 − " + fr(t / 100) + " = " + fr(1 - t / 100), "1 ÷ " + fr(1 - t / 100) + " = " + fr(1 / (1 - t / 100), 3), "Hausse = " + fr(up, 1) + " %"],
         traps: [{ v: t, code: "E03", msg: "La hausse se calcule sur la base réduite : elle est plus grande que la baisse." }] }); });
   def("R25", { name: "Proportion inverse (règle de trois inverse)", book: "§14.7", lvl: "B", signal: "Plus de machines → moins de jours : on passe par le total (machine-jours).", trap: "Faire une règle de trois directe.", check: "Plus de ressources = moins de temps." },
