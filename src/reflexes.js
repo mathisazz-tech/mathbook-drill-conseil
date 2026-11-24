@@ -227,4 +227,16 @@
         return out({ p: { n: n }, q: n + "²", ans: n * n, rule: "Carré à connaître par cœur (de 11 à 25).", steps: [n + "² = " + n * n] }); }
       var b = r.p([25, 50, 75, 125, 150, 200, 350]);
       return out({ p: { b: b }, q: b + " bps en points de %", ans: b / 100, unit: "points", rule: "100 bps = 1 point de %.", steps: [b + " ÷ 100 = " + fr(b / 100) + " point" + (b >= 200 ? "s" : "")] }); });
+  def("R34", { name: "Règle de 72 et repères de croissance", book: "§16", signal: "Doublement, CAGR ou TRI sur plusieurs années : jamais de racine ni de puissance de tête.", trap: "Diviser la croissance totale par le nombre d'années : c'est trop haut.", check: "Taux × années ≈ 72 pour un doublement." },
+    { use: "Lire vite une croissance ou un rendement : « le marché a doublé en 6 ans » = environ 12 % par an ; « 2× en 5 ans » = environ 15 % de TRI.", ex: "72 ÷ 5 ≈ 14,4 %, donc 2× en 5 ans ≈ 15 % par an.", eq: ["Années pour doubler ≈ 72 ÷ taux (%)", "Taux pour doubler ≈ 72 ÷ années", "1,1⁵ ≈ 1,61   1,15⁵ ≈ 2   1,2⁵ ≈ 2,5   1,25⁵ ≈ 3"] },
+    function (r) { var v = r.i(0, 2);
+      if (v === 0) { var n = r.p([4, 5, 6, 8, 9, 10, 12]), ex = (Math.pow(2, 1 / n) - 1) * 100;
+        return out({ p: { n: n }, q: "Une valeur double en " + n + " ans. Croissance annuelle ?", ans: ex, unit: "%", tol: { abs: 1, label: "±1 point" }, rule: "Règle de 72 : taux pour doubler ≈ 72 ÷ nombre d'années.",
+          steps: ["72 ÷ " + n + " = " + fr(rd(72 / n, 1), 1) + " %", "Exact : " + fr(rd(ex, 1), 1) + " %, la règle suffit en case"] }); }
+      if (v === 1) { var g = r.p([6, 8, 9, 12, 18, 24]), y = Math.log(2) / Math.log(1 + g / 100);
+        return out({ p: { g: g }, q: "Croissance de " + g + " % par an. En combien d'années la valeur double-t-elle ?", ans: y, unit: "ans", tol: { rel: 0.08, label: "±8 %" }, rule: "Règle de 72 : années pour doubler ≈ 72 ÷ taux.",
+          steps: ["72 ÷ " + g + " = " + fr(rd(72 / g, 1), 1) + " ans", "Exact : " + fr(rd(y, 1), 1) + " ans"] }); }
+      var k = r.p([[1.1, 2, 1.21], [1.1, 3, 1.331], [1.1, 5, 1.6105], [1.15, 5, 2.0114], [1.2, 5, 2.4883], [1.25, 5, 3.0518], [1.2, 2, 1.44], [1.15, 2, 1.3225]]);
+      return out({ p: { b: k[0], n: k[1] }, q: fr(k[0]) + "^" + k[1] + " ≈ ? (2 décimales)", ans: k[2], unit: "", tol: { abs: 0.03, label: "±0,03" }, rule: "Repère à connaître par cœur. Pour le retrouver, ajoute " + fr(rd((k[0] - 1) * 100, 0)) + " % à chaque étape en arrondissant.",
+        steps: (function () { var st = [], a = k[0]; for (var i = 2; i <= k[1]; i++) { var prev = rd(a, 2); a = prev * k[0]; st.push(fr(k[0]) + "^" + i + " ≈ " + fr(prev, 2) + " + " + fr(rd(prev * (k[0] - 1), 2), 2) + " ≈ " + fr(rd(a, 2), 2)); } return st; })() }); });
 })();

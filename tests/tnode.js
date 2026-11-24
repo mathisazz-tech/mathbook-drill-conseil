@@ -1,4 +1,4 @@
-global.DRILL=require('./catalog.js'); global.LESSONS=require('./lessons.js'); require('./reflexes.js'); global.EXPLAIN=require('./explain.js'); const E=require('./engine.js');
+global.DRILL=require('./catalog.js'); global.LESSONS=require('./lessons.js'); require('./reflexes.js'); global.EXPLAIN=require('./explain.js'); global.TIPS=require('./tips.js'); const E=require('./engine.js');
 let fails=0; const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m); if(!c)fails++;};
 // T01
 ok(['+70','-5','−5','+0,5'].map(E.parseNum).join()==='70,-5,-5,0.5','T01 signes acceptés');

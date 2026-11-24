@@ -65,8 +65,8 @@ var EXPLAIN = (function () {
     it.rule = "On arrondit " + fr(a) + " à " + A + " pour calculer de tête, et on dit dans quel sens on s'est trompé.";
     it.steps = [fr(a) + " ≈ " + A, A + " × " + b + " = " + fr(A * b), "Exact : " + fr(it.ans, 2) + " (l'arrondi a gonflé le résultat)"]; });
   wrap("M11", function (it) { var p = it.p;
-    if (p.n === undefined) { it.rule = "Règle de 70 : temps de doublement ≈ 70 ÷ taux de croissance (en %).";
-      it.steps = ["70 ÷ " + p.g + " = " + fr(70 / p.g, 1) + " ans", "(Exact : " + fr(it.ans, 2) + " ans)"]; }
+    if (p.n === undefined) { it.rule = "Règle de 72 : temps de doublement ≈ 72 ÷ taux de croissance (en %).";
+      it.steps = ["72 ÷ " + p.g + " = " + fr(72 / p.g, 1) + " ans", "(Exact : " + fr(it.ans, 2) + " ans)"]; }
     else { var c = 1 + p.g / 100, st = ["Coefficient annuel = " + fr(c)], acc = 1;
       for (var i = 1; i <= p.n; i++) { acc *= c; if (i > 1) st.push(fr(c) + "^" + i + " = " + fr(acc, 4)); }
       st.push("Croissance totale = " + fr(it.ans, 2) + " %");

@@ -96,6 +96,7 @@ textarea{width:100%;min-height:90px;font:14px ui-monospace,Menlo,monospace;borde
 .check{color:var(--ok);font-weight:700}
 button.len{min-width:52px}
 button.len.on{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:600}
+.tipc{margin:6px 0 10px;line-height:1.45}
 </style>
 </head>
 <body>
@@ -294,7 +295,7 @@ var DRILL = (function () {
   def("M08", { prio: "P0", lvl: "A", name: "Variations successives, base d'origine", formula: "(1 + a)(1 + b) − 1 · base = final ÷ (1 + t)", signal: "Quand je vois « après une hausse de t » → diviser par (1 + t).", trap: "Retirer t % du final, ou additionner des variations successives.", check: "+20 % puis −20 % = −4 %, jamais 0." });
   def("M09", { prio: "P0", lvl: "A", name: "Équations simples, produit en croix", formula: "a·x = b → x = b ÷ a · règle de trois si proportionnel", signal: "Quand on connaît le résultat et le taux → isoler l'inconnue.", trap: "Règle de trois sur une relation non proportionnelle.", check: "Réinjecter x dans l'équation." });
   def("M10", { prio: "P0", lvl: "A", name: "Arrondis, estimation, bornes", formula: "Arrondir chaque facteur, puis corriger le sens de l'erreur", signal: "Quand les nombres sont « presque ronds » → estimer puis affiner.", trap: "Arrondir deux facteurs dans le même sens sans le dire.", check: "19,8 × 51 ≈ 1 000 (exact 1 009,8)." });
-  def("M11", { prio: "P1", lvl: "A", name: "Puissances, doublement, CAGR approché", formula: "(1 + g)ⁿ · doublement ≈ 70 ÷ g% (exact ln 2 / ln(1 + g))", signal: "Quand on demande « en combien d'années double… » → règle de 70.", trap: "Prendre 72 pour une identité ; c'est une approximation.", check: "1,1² = 1,21 ; 1,1⁵ ≈ 1,61 ; 1,15⁵ ≈ 2." });
+  def("M11", { prio: "P1", lvl: "A", name: "Puissances, doublement, CAGR approché", formula: "(1 + g)ⁿ · doublement ≈ 72 ÷ g% (exact ln 2 / ln(1 + g))", signal: "Quand on demande « en combien d'années double… » → règle de 72.", trap: "Prendre 72 pour une identité ; c'est une approximation.", check: "1,1² = 1,21 ; 1,1⁵ ≈ 1,61 ; 1,15⁵ ≈ 2." });
 
   // --- C : mécanismes case ---
   def("C01", { prio: "P0", lvl: "B", name: "Sizing par la demande", formula: "Marché = population × éligibilité × pénétration × fréquence × prix", signal: "Quand on demande la taille d'un marché grand public → arbre de demande.", trap: "Multiplier deux taux qui ont le même dénominateur.", check: "Comparer au PIB ou à un marché connu." });
@@ -475,8 +476,8 @@ var DRILL = (function () {
   G.M11 = function (r) {
     var v = r.i(0, 1);
     if (v === 0) { var g = r.p([5, 7, 10, 14]), ex = Math.log(2) / Math.log(1 + g / 100);
-      return { p: { g: g }, q: "Croissance de " + g + " % par an. En combien d'années la valeur double-t-elle ?", ans: ex, unit: "années", tol: { rel: 0.06, label: "±6 % (règle de 70)" },
-        method: "70 ÷ " + g + " = " + fr(70 / g, 1) + " ans (exact ln 2 / ln(1 + g) = " + fr(ex, 2) + ")" }; }
+      return { p: { g: g }, q: "Croissance de " + g + " % par an. En combien d'années la valeur double-t-elle ?", ans: ex, unit: "années", tol: { rel: 0.06, label: "±6 % (règle de 72)" },
+        method: "72 ÷ " + g + " = " + fr(72 / g, 1) + " ans (exact ln 2 / ln(1 + g) = " + fr(ex, 2) + ")" }; }
     var g2 = r.p([5, 10, 20, 15]), n = r.p([2, 3]), ans = (Math.pow(1 + g2 / 100, n) - 1) * 100;
     return { p: { g: g2, n: n }, q: "+" + g2 + " % par an pendant " + n + " ans. Croissance totale ?", ans: ans, unit: "%", tol: T.P01,
       method: "(1 + " + fr(g2 / 100) + ")^" + n + " = " + fr(Math.pow(1 + g2 / 100, n), 4) + " → " + fr(ans, 2) + " %",
@@ -1064,8 +1065,8 @@ var LESSONS = (function () {
       ex: "19,8 × 51 ≈ 20 × 50 = 1 000 (exact 1 009,8).",
       eq: ["Arrondir chaque facteur au nombre rond le plus proche", "Indiquer si l'estimation est au-dessus ou en dessous"] },
     M11: { use: "Croissance composée sur plusieurs années, temps de doublement d'un marché, rendement annuel d'un fonds.",
-      ex: "Un marché à +7 %/an double en 70 ÷ 7 = 10 ans.",
-      eq: ["Croissance sur n ans = (1 + g)ⁿ − 1", "Temps de doublement ≈ 70 ÷ g (en %)"] },
+      ex: "Un marché à +8 %/an double en 72 ÷ 8 = 9 ans ; un marché qui double en 5 ans croît d'environ 72 ÷ 5 ≈ 15 %/an.",
+      eq: ["Croissance sur n ans = (1 + g)ⁿ − 1", "Temps de doublement ≈ 72 ÷ g (en %)"] },
 
     // ---------------- Marché, revenus ----------------
     C01: { use: "Estimer la taille d'un marché grand public avant de décider d'y entrer. C'est souvent la 1re question chiffrée du case.",
@@ -1568,6 +1569,18 @@ if (typeof module !== "undefined") module.exports = LESSONS;
         return out({ p: { n: n }, q: n + "²", ans: n * n, rule: "Carré à connaître par cœur (de 11 à 25).", steps: [n + "² = " + n * n] }); }
       var b = r.p([25, 50, 75, 125, 150, 200, 350]);
       return out({ p: { b: b }, q: b + " bps en points de %", ans: b / 100, unit: "points", rule: "100 bps = 1 point de %.", steps: [b + " ÷ 100 = " + fr(b / 100) + " point" + (b >= 200 ? "s" : "")] }); });
+  def("R34", { name: "Règle de 72 et repères de croissance", book: "§16", signal: "Doublement, CAGR ou TRI sur plusieurs années : jamais de racine ni de puissance de tête.", trap: "Diviser la croissance totale par le nombre d'années : c'est trop haut.", check: "Taux × années ≈ 72 pour un doublement." },
+    { use: "Lire vite une croissance ou un rendement : « le marché a doublé en 6 ans » = environ 12 % par an ; « 2× en 5 ans » = environ 15 % de TRI.", ex: "72 ÷ 5 ≈ 14,4 %, donc 2× en 5 ans ≈ 15 % par an.", eq: ["Années pour doubler ≈ 72 ÷ taux (%)", "Taux pour doubler ≈ 72 ÷ années", "1,1⁵ ≈ 1,61   1,15⁵ ≈ 2   1,2⁵ ≈ 2,5   1,25⁵ ≈ 3"] },
+    function (r) { var v = r.i(0, 2);
+      if (v === 0) { var n = r.p([4, 5, 6, 8, 9, 10, 12]), ex = (Math.pow(2, 1 / n) - 1) * 100;
+        return out({ p: { n: n }, q: "Une valeur double en " + n + " ans. Croissance annuelle ?", ans: ex, unit: "%", tol: { abs: 1, label: "±1 point" }, rule: "Règle de 72 : taux pour doubler ≈ 72 ÷ nombre d'années.",
+          steps: ["72 ÷ " + n + " = " + fr(rd(72 / n, 1), 1) + " %", "Exact : " + fr(rd(ex, 1), 1) + " %, la règle suffit en case"] }); }
+      if (v === 1) { var g = r.p([6, 8, 9, 12, 18, 24]), y = Math.log(2) / Math.log(1 + g / 100);
+        return out({ p: { g: g }, q: "Croissance de " + g + " % par an. En combien d'années la valeur double-t-elle ?", ans: y, unit: "ans", tol: { rel: 0.08, label: "±8 %" }, rule: "Règle de 72 : années pour doubler ≈ 72 ÷ taux.",
+          steps: ["72 ÷ " + g + " = " + fr(rd(72 / g, 1), 1) + " ans", "Exact : " + fr(rd(y, 1), 1) + " ans"] }); }
+      var k = r.p([[1.1, 2, 1.21], [1.1, 3, 1.331], [1.1, 5, 1.6105], [1.15, 5, 2.0114], [1.2, 5, 2.4883], [1.25, 5, 3.0518], [1.2, 2, 1.44], [1.15, 2, 1.3225]]);
+      return out({ p: { b: k[0], n: k[1] }, q: fr(k[0]) + "^" + k[1] + " ≈ ? (2 décimales)", ans: k[2], unit: "", tol: { abs: 0.03, label: "±0,03" }, rule: "Repère à connaître par cœur. Pour le retrouver, ajoute " + fr(rd((k[0] - 1) * 100, 0)) + " % à chaque étape en arrondissant.",
+        steps: (function () { var st = [], a = k[0]; for (var i = 2; i <= k[1]; i++) { var prev = rd(a, 2); a = prev * k[0]; st.push(fr(k[0]) + "^" + i + " ≈ " + fr(prev, 2) + " + " + fr(rd(prev * (k[0] - 1), 2), 2) + " ≈ " + fr(rd(a, 2), 2)); } return st; })() }); });
 })();
 
 </script>
@@ -1639,8 +1652,8 @@ var EXPLAIN = (function () {
     it.rule = "On arrondit " + fr(a) + " à " + A + " pour calculer de tête, et on dit dans quel sens on s'est trompé.";
     it.steps = [fr(a) + " ≈ " + A, A + " × " + b + " = " + fr(A * b), "Exact : " + fr(it.ans, 2) + " (l'arrondi a gonflé le résultat)"]; });
   wrap("M11", function (it) { var p = it.p;
-    if (p.n === undefined) { it.rule = "Règle de 70 : temps de doublement ≈ 70 ÷ taux de croissance (en %).";
-      it.steps = ["70 ÷ " + p.g + " = " + fr(70 / p.g, 1) + " ans", "(Exact : " + fr(it.ans, 2) + " ans)"]; }
+    if (p.n === undefined) { it.rule = "Règle de 72 : temps de doublement ≈ 72 ÷ taux de croissance (en %).";
+      it.steps = ["72 ÷ " + p.g + " = " + fr(72 / p.g, 1) + " ans", "(Exact : " + fr(it.ans, 2) + " ans)"]; }
     else { var c = 1 + p.g / 100, st = ["Coefficient annuel = " + fr(c)], acc = 1;
       for (var i = 1; i <= p.n; i++) { acc *= c; if (i > 1) st.push(fr(c) + "^" + i + " = " + fr(acc, 4)); }
       st.push("Croissance totale = " + fr(it.ans, 2) + " %");
@@ -1677,6 +1690,58 @@ var EXPLAIN = (function () {
   return { stepsOf: stepsOf, splitMethod: splitMethod };
 })();
 if (typeof module !== "undefined") module.exports = EXPLAIN;
+
+</script>
+<script>
+/* MathDrill V3 — astuces de calcul (tips du MathBook) affichées avec chaque question.
+   TIPS.T : la bibliothèque. TIPS.MAP : pour chaque notion, les astuces utiles, la plus utile d'abord. */
+var TIPS = (function () {
+  "use strict";
+  var T = {
+    R72: { t: "Règle de 72", d: "Doublement : années ≈ 72 ÷ taux, et taux ≈ 72 ÷ années.", ex: "2× en 5 ans : 72 ÷ 5 ≈ 14,4 %, donc environ 15 %. À 8 % par an, ça double en 72 ÷ 8 = 9 ans.", book: "§16" },
+    REP: { t: "Repères de croissance composée", d: "À savoir par cœur pour ne jamais calculer de puissance.", ex: "1,1² = 1,21 · 1,1³ ≈ 1,33 · 1,1⁵ ≈ 1,61 · 1,15⁵ ≈ 2 · 1,2⁵ ≈ 2,5 · 1,25⁵ ≈ 3." },
+    JET: { t: "CAGR : premier jet, puis on descend", d: "Croissance totale ÷ n donne un taux trop haut (la croissance se compose). Le vrai CAGR est un peu en dessous.", ex: "+100 % en 5 ans : 100 ÷ 5 = 20 %, trop haut. Vrai CAGR ≈ 15 %." },
+    RATIO: { t: "Arrondir le ratio", d: "Deux chiffres significatifs suffisent en case. Le reste se néglige.", ex: "804,5 ÷ 400 ≈ 800 ÷ 400 = 2." },
+    ZERO: { t: "Les zéros à part", d: "Calcule avec les chiffres utiles, compte les zéros séparément, puis annonce l'unité (k, M, Md).", ex: "3,6 M × 25 € = 3,6 × 25 = 90, donc 90 M€.", book: "§1.4, §3.6" },
+    MDM: { t: "Md ÷ M = × 1 000", d: "Un montant en milliards divisé par des millions donne des milliers.", ex: "2,4 Md€ ÷ 60 M habitants = 2 400 ÷ 60 = 40 € par habitant.", book: "§5.9" },
+    MORC: { t: "Diviser par morceaux", d: "Coupe le dividende en parts faciles à diviser, puis additionne.", ex: "924 ÷ 7 = 700 ÷ 7 + 224 ÷ 7 = 100 + 32 = 132.", book: "§4.5" },
+    DBL: { t: "Doubler les deux termes", d: "Pour ÷ 5, ÷ 15, ÷ 25, ÷ 35 : double le haut et le bas, le résultat ne change pas.", ex: "340 ÷ 5 = 680 ÷ 10 = 68 ; 210 ÷ 15 = 420 ÷ 30 = 14.", book: "§4.6" },
+    FRAC: { t: "Fractions ↔ %", d: "Remplace un % par une fraction simple, ou l'inverse.", ex: "1/8 = 12,5 % · 1/7 ≈ 14,3 % · 1/6 ≈ 16,7 % · 1/3 ≈ 33,3 % · 3/8 = 37,5 %.", book: "§0.1, §4.11" },
+    PCT: { t: "Un % = une division simple", d: "Choisis la forme la plus facile : 25 % = ÷ 4, 20 % = ÷ 5, 12,5 % = ÷ 8, 15 % = 10 % + 5 %.", ex: "15 % de 480 = 48 + 24 = 72." },
+    X25: { t: "× 5, × 25, × 125", d: "× 5 = ÷ 2 puis × 10 · × 25 = ÷ 4 puis × 100 · × 125 = ÷ 8 puis × 1 000.", ex: "36 × 25 = 36 ÷ 4 × 100 = 900.", book: "§3.3, §7.6" },
+    COMP: { t: "Compenser avec un rond", d: "Passe par le nombre rond le plus proche, puis corrige l'écart.", ex: "1 203 − 847 : 847 → 1 000 = 153, puis + 203 = 356.", book: "§2.6–2.8" },
+    CROSS: { t: "Le terme croisé", d: "Deux variations : (1 + a)(1 + b) − 1 = a + b + a × b. Ne pas oublier a × b.", ex: "Prix +10 %, volume −10 % : 10 − 10 − 1 = −1 %.", book: "§14.4" },
+    INV: { t: "Revenir à la base", d: "Un montant qui contient déjà une hausse se divise par (1 + t), il ne se réduit pas de t %.", ex: "120 après +20 % : base = 120 ÷ 1,2 = 100 (pas 96).", book: "§14.5" },
+    PTS: { t: "Points × base", d: "Un écart en points de % se convertit en montant en le multipliant par la base.", ex: "2 points de marge sur 50 M€ de CA = 0,02 × 50 = 1 M€. 1 bp = 0,01 %.", book: "§14.3" },
+    MID: { t: "Moyenne pondérée par l'écart", d: "Pars de la plus petite valeur et ajoute l'écart × le poids de l'autre.", ex: "30 % à 20 % et 70 % à 40 % : 20 + 0,7 × 20 = 34 %." },
+    CHAIN: { t: "Taux enchaînés = on multiplie", d: "Funnel, rendements, TRS : multiplie les taux, ne les additionne pas. Le total est plus bas que chaque taux.", ex: "50 % × 20 % = 10 % ; 90 % × 95 % × 98 % ≈ 84 %.", book: "§17.2" },
+    ANN: { t: "Annualiser", d: "× 12 (mois), × 52 (semaines), × 365 ≈ 360 (jours), 8 760 heures par an.", ex: "30 jours de CA ≈ 1/12 du CA annuel.", book: "§16.7" },
+    DIVT: { t: "Diviser par un taux", d: "÷ 10 % = × 10 · ÷ 8 % = × 12,5 · ÷ 5 % = × 20 · ÷ 4 % = × 25.", ex: "Perpétuité 6 M€ à 8 % : 6 × 12,5 = 75 M€." },
+    ACT: { t: "Facteurs d'actualisation à 10 %", d: "Pour actualiser sans calculer de puissance.", ex: "1/1,1 ≈ 0,91 · 1/1,1² ≈ 0,83 · 1/1,1³ ≈ 0,75 · 1/1,1⁵ ≈ 0,62." },
+    ROUND: { t: "Arrondir, puis dire dans quel sens", d: "Arrondis pour calculer vite, puis précise si le vrai résultat est au-dessus ou en dessous.", ex: "19,8 × 51 ≈ 20 × 50 = 1 000 (exact 1 009,8).", book: "§5" },
+    RULE3: { t: "Règle de trois inverse", d: "Plus de ressources, moins de temps : le produit ressources × temps reste constant.", ex: "6 équipes en 10 jours = 60 équipes-jours ; avec 4 équipes : 15 jours.", book: "§14.7" },
+    UNIT: { t: "Marge unitaire d'abord", d: "Pour un point mort ou un seuil, calcule d'abord ce que rapporte une unité, puis divise.", ex: "Fixes 600 k€, prix 50 €, variable 30 € : 600 k ÷ 20 = 30 k unités." }
+  };
+  var M = {
+    M01: ["COMP", "ROUND"], M02: ["X25", "ROUND"], M03: ["X25", "FRAC"], M04: ["MORC", "DBL", "FRAC"], M05: ["FRAC", "PCT"], M06: ["ZERO", "MDM"],
+    M07: ["PTS"], M08: ["CROSS", "INV"], M09: ["DBL", "MORC"], M10: ["ROUND"], M11: ["R72", "REP", "JET"],
+    C01: ["ZERO", "PCT", "ROUND"], C02: ["ZERO", "ANN"], C03: ["ZERO", "MORC"], C04: ["ZERO", "X25"], C05: ["FRAC", "PCT"], C06: ["MID", "PTS"],
+    C07: ["CHAIN", "PCT"], C08: ["R72", "REP", "JET", "RATIO"], C09: ["CROSS"], C10: ["CHAIN", "ANN"], C11: ["PCT", "ZERO"], C12: ["DIVT", "PCT"],
+    C13: ["PTS", "PCT"], C14: ["PTS", "UNIT"], C15: ["INV", "FRAC"], C16: ["UNIT", "MORC", "DBL"], C17: ["UNIT", "FRAC"], C18: ["CROSS", "PCT"],
+    C19: ["PTS", "CROSS"], C20: ["ANN", "CHAIN"], C21: ["CHAIN"], C22: ["RULE3", "ANN"], C23: ["UNIT", "MORC"], C24: ["RULE3", "ANN"],
+    C25: ["CHAIN", "INV"], C26: ["MORC"], C27: ["PCT"], C28: ["ANN", "FRAC"], C29: ["PTS"], C30: ["COMP"], C31: ["DIVT", "ACT"],
+    C32: ["ZERO", "X25"], C33: ["DIVT", "R72"], C34: ["PCT", "MID"], C35: ["UNIT", "MORC"], C36: ["PCT", "ZERO"], C37: ["ROUND", "ZERO"],
+    D01: ["ZERO"], D02: ["ZERO"], D03: ["DIVT", "ZERO"], D04: ["MID"], D05: ["PCT", "INV"], D06: ["MID"], D07: ["DIVT"], D08: ["DIVT"],
+    D09: ["PTS"], D10: ["DIVT", "ACT"], D11: ["PTS"], D12: ["DIVT", "ACT"], D13: ["MID"], D14: ["PCT", "PTS"], D15: ["R72", "REP", "JET"],
+    D16: ["ZERO"], D17: ["ZERO", "X25"], D18: ["R72", "REP", "ACT"], D19: ["MORC"], D20: ["MORC", "ZERO"], D21: ["COMP"], D22: ["FRAC"], D23: ["PCT"],
+    S01: ["MID", "ANN"], S02: ["ANN"], S03: ["ZERO"], S04: ["PTS", "PCT"], S05: ["PTS", "ANN"], S06: ["CHAIN"], S07: ["PTS"], S08: ["DIVT", "ANN"], S09: ["CROSS", "INV"],
+    R11: ["ZERO"], R17: ["DBL"], R18: ["MORC"], R20: ["FRAC"], R21: ["PCT"], R22: ["MDM", "ZERO"], R23: ["PTS"], R24: ["INV"], R25: ["RULE3"],
+    R26: ["CROSS"], R28: ["ANN", "R72"], R29: ["CHAIN"], R31: ["DIVT"], R33: ["FRAC", "REP"], R34: ["R72", "REP", "JET"]
+  };
+  function of(pid) { return (M[pid] || []).map(function (k) { return T[k]; }).filter(Boolean); }
+  return { T: T, MAP: M, of: of };
+})();
+if (typeof module !== "undefined") module.exports = TIPS;
 
 </script>
 <script>
@@ -1934,7 +1999,7 @@ if (typeof module !== "undefined") module.exports = ENGINE;
 /* MathDrill V3 — interface. Pas de LLM : toutes les réponses viennent des générateurs déterministes. */
 (function () {
   "use strict";
-  var D = DRILL, E = ENGINE, LS = LESSONS, X = EXPLAIN, C = D.CAT;
+  var D = DRILL, E = ENGINE, LS = LESSONS, X = EXPLAIN, TP = TIPS, C = D.CAT;
   var KEY = "mathdrill.v3", VERSION = "3.0";
   var $ = function (id) { return document.getElementById(id); };
   function esc(s) { return String(s === undefined || s === null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
@@ -2070,11 +2135,14 @@ if (typeof module !== "undefined") module.exports = ENGINE;
     h += blk("Cas d'usage", esc(L.ex || ""));
     h += blk("Formule", (L.eq || [c.formula]).map(function (e) { return '<div class="eq">' + esc(e) + "</div>"; }).join(""));
     if (it) h += blk("Exemple pas à pas", (it.rule ? '<p>' + esc(it.rule) + "</p>" : "") + '<p class="small">' + esc(it.q) + "</p>" + stepsHTML(it));
+    h += tipsHTML(p);
     h += blk("Quand y penser", esc(c.signal || ""));
     h += blk("Piège", '<div class="tip">' + esc(c.trap || "") + "</div>");
     h += blk("Contrôle", esc(c.check || ""));
     return h;
   }
+  function tipsHTML(p) { var t = TP.of(p); if (!t.length) return "";
+    return blk("Astuces de calcul", t.map(function (x) { return '<div class="tipc"><b>' + esc(x.t) + "</b> : " + esc(x.d) + '<div class="small">Ex. ' + esc(x.ex) + (x.book ? " (MathBook " + esc(x.book) + ")" : "") + "</div></div>"; }).join("")); }
   function blk(lbl, inner) { return inner ? '<div class="blk"><div class="lbl">' + esc(lbl) + "</div>" + inner + "</div>" : ""; }
   function stepsHTML(it) { var st = X.stepsOf(it); return '<ol class="steps">' + st.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + "</ol>"; }
   var lessonFrom = "fam";
@@ -2244,7 +2312,7 @@ if (typeof module !== "undefined") module.exports = ENGINE;
     function flash() { var u = $("zone").querySelector(".units"); if (u) { u.style.outline = "2px solid var(--ko)"; setTimeout(function () { u.style.outline = ""; }, 700); } }
     each("#zone .pad button", function (b) { b.onclick = function () { press(b.dataset.k); }; });
     each("#zone .units button", function (b) { b.onclick = function () { unit = b.dataset.u; each("#zone .units button", function (x) { x.classList.toggle("on", x === b); }); paint(); }; });
-    $("hintBtn").onclick = function () { it.hint = true; this.disabled = true; $("hintBox").innerHTML = '<div class="tip"><b>Indice :</b> ' + esc(it.rule || (LS.L[slot.pid].eq || [C[slot.pid].formula]).join(" · ")) + '<br><span class="small">Une réussite avec indice compte, mais pas pour le statut « maîtrisé ».</span></div>'; };
+    $("hintBtn").onclick = function () { it.hint = true; this.disabled = true; $("hintBox").innerHTML = '<div class="tip"><b>Indice :</b> ' + esc(it.rule || (LS.L[slot.pid].eq || [C[slot.pid].formula]).join(" · ")) + (TP.of(slot.pid)[0] ? '<br><b>Astuce :</b> ' + esc(TP.of(slot.pid)[0].t + " : " + TP.of(slot.pid)[0].d) : "") + '<br><span class="small">Une réussite avec indice compte, mais pas pour le statut « maîtrisé ».</span></div>'; };
     $("dunno").onclick = function () { submit(slot, it, null, null, null, true); };
     keyHandler = function (e) {
       if (cur !== "run") return;
@@ -2284,6 +2352,7 @@ if (typeof module !== "undefined") module.exports = ENGINE;
     h += "</div>";
     if (it.rule) h += blk("La règle utilisée ici", "<p>" + esc(it.rule) + "</p>");
     h += blk("Méthode pas à pas", stepsHTML(it));
+    h += tipsHTML(pid);
     h += blk("Formule", (L.eq || [c.formula]).map(function (e) { return '<div class="eq">' + esc(e) + "</div>"; }).join(""));
     h += blk("À quoi ça sert en case", esc(L.use || ""));
     h += blk("Cas d'usage", esc(L.ex || ""));

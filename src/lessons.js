@@ -37,8 +37,8 @@ var LESSONS = (function () {
       ex: "19,8 × 51 ≈ 20 × 50 = 1 000 (exact 1 009,8).",
       eq: ["Arrondir chaque facteur au nombre rond le plus proche", "Indiquer si l'estimation est au-dessus ou en dessous"] },
     M11: { use: "Croissance composée sur plusieurs années, temps de doublement d'un marché, rendement annuel d'un fonds.",
-      ex: "Un marché à +7 %/an double en 70 ÷ 7 = 10 ans.",
-      eq: ["Croissance sur n ans = (1 + g)ⁿ − 1", "Temps de doublement ≈ 70 ÷ g (en %)"] },
+      ex: "Un marché à +8 %/an double en 72 ÷ 8 = 9 ans ; un marché qui double en 5 ans croît d'environ 72 ÷ 5 ≈ 15 %/an.",
+      eq: ["Croissance sur n ans = (1 + g)ⁿ − 1", "Temps de doublement ≈ 72 ÷ g (en %)"] },
 
     // ---------------- Marché, revenus ----------------
     C01: { use: "Estimer la taille d'un marché grand public avant de décider d'y entrer. C'est souvent la 1re question chiffrée du case.",

@@ -1,7 +1,7 @@
 import pathlib, json, hashlib
 d=pathlib.Path(__file__).parent; out=d/'dist'; out.mkdir(exist_ok=True)
 h=(d/'app3.html').read_text()
-for tag,f in [('CATALOG','catalog.js'),('LESSONS','lessons.js'),('REFLEXES','reflexes.js'),('EXPLAIN','explain.js'),('ENGINE','engine.js'),('APP','app.js')]:
+for tag,f in [('CATALOG','catalog.js'),('LESSONS','lessons.js'),('REFLEXES','reflexes.js'),('EXPLAIN','explain.js'),('TIPS','tips.js'),('ENGINE','engine.js'),('APP','app.js')]:
     h=h.replace('/*%s*/'%tag,(d/f).read_text())
 (out/'index.html').write_text(h)
 ver=hashlib.sha1(h.encode()).hexdigest()[:10]

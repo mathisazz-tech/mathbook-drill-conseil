@@ -121,7 +121,7 @@ var DRILL = (function () {
   def("M08", { prio: "P0", lvl: "A", name: "Variations successives, base d'origine", formula: "(1 + a)(1 + b) − 1 · base = final ÷ (1 + t)", signal: "Quand je vois « après une hausse de t » → diviser par (1 + t).", trap: "Retirer t % du final, ou additionner des variations successives.", check: "+20 % puis −20 % = −4 %, jamais 0." });
   def("M09", { prio: "P0", lvl: "A", name: "Équations simples, produit en croix", formula: "a·x = b → x = b ÷ a · règle de trois si proportionnel", signal: "Quand on connaît le résultat et le taux → isoler l'inconnue.", trap: "Règle de trois sur une relation non proportionnelle.", check: "Réinjecter x dans l'équation." });
   def("M10", { prio: "P0", lvl: "A", name: "Arrondis, estimation, bornes", formula: "Arrondir chaque facteur, puis corriger le sens de l'erreur", signal: "Quand les nombres sont « presque ronds » → estimer puis affiner.", trap: "Arrondir deux facteurs dans le même sens sans le dire.", check: "19,8 × 51 ≈ 1 000 (exact 1 009,8)." });
-  def("M11", { prio: "P1", lvl: "A", name: "Puissances, doublement, CAGR approché", formula: "(1 + g)ⁿ · doublement ≈ 70 ÷ g% (exact ln 2 / ln(1 + g))", signal: "Quand on demande « en combien d'années double… » → règle de 70.", trap: "Prendre 72 pour une identité ; c'est une approximation.", check: "1,1² = 1,21 ; 1,1⁵ ≈ 1,61 ; 1,15⁵ ≈ 2." });
+  def("M11", { prio: "P1", lvl: "A", name: "Puissances, doublement, CAGR approché", formula: "(1 + g)ⁿ · doublement ≈ 72 ÷ g% (exact ln 2 / ln(1 + g))", signal: "Quand on demande « en combien d'années double… » → règle de 72.", trap: "Prendre 72 pour une identité ; c'est une approximation.", check: "1,1² = 1,21 ; 1,1⁵ ≈ 1,61 ; 1,15⁵ ≈ 2." });
 
   // --- C : mécanismes case ---
   def("C01", { prio: "P0", lvl: "B", name: "Sizing par la demande", formula: "Marché = population × éligibilité × pénétration × fréquence × prix", signal: "Quand on demande la taille d'un marché grand public → arbre de demande.", trap: "Multiplier deux taux qui ont le même dénominateur.", check: "Comparer au PIB ou à un marché connu." });
@@ -302,8 +302,8 @@ var DRILL = (function () {
   G.M11 = function (r) {
     var v = r.i(0, 1);
     if (v === 0) { var g = r.p([5, 7, 10, 14]), ex = Math.log(2) / Math.log(1 + g / 100);
-      return { p: { g: g }, q: "Croissance de " + g + " % par an. En combien d'années la valeur double-t-elle ?", ans: ex, unit: "années", tol: { rel: 0.06, label: "±6 % (règle de 70)" },
-        method: "70 ÷ " + g + " = " + fr(70 / g, 1) + " ans (exact ln 2 / ln(1 + g) = " + fr(ex, 2) + ")" }; }
+      return { p: { g: g }, q: "Croissance de " + g + " % par an. En combien d'années la valeur double-t-elle ?", ans: ex, unit: "années", tol: { rel: 0.06, label: "±6 % (règle de 72)" },
+        method: "72 ÷ " + g + " = " + fr(72 / g, 1) + " ans (exact ln 2 / ln(1 + g) = " + fr(ex, 2) + ")" }; }
     var g2 = r.p([5, 10, 20, 15]), n = r.p([2, 3]), ans = (Math.pow(1 + g2 / 100, n) - 1) * 100;
     return { p: { g: g2, n: n }, q: "+" + g2 + " % par an pendant " + n + " ans. Croissance totale ?", ans: ans, unit: "%", tol: T.P01,
       method: "(1 + " + fr(g2 / 100) + ")^" + n + " = " + fr(Math.pow(1 + g2 / 100, n), 4) + " → " + fr(ans, 2) + " %",

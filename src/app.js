@@ -1,7 +1,7 @@
 /* MathDrill V3 — interface. Pas de LLM : toutes les réponses viennent des générateurs déterministes. */
 (function () {
   "use strict";
-  var D = DRILL, E = ENGINE, LS = LESSONS, X = EXPLAIN, C = D.CAT;
+  var D = DRILL, E = ENGINE, LS = LESSONS, X = EXPLAIN, TP = TIPS, C = D.CAT;
   var KEY = "mathdrill.v3", VERSION = "3.0";
   var $ = function (id) { return document.getElementById(id); };
   function esc(s) { return String(s === undefined || s === null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
@@ -137,11 +137,14 @@
     h += blk("Cas d'usage", esc(L.ex || ""));
     h += blk("Formule", (L.eq || [c.formula]).map(function (e) { return '<div class="eq">' + esc(e) + "</div>"; }).join(""));
     if (it) h += blk("Exemple pas à pas", (it.rule ? '<p>' + esc(it.rule) + "</p>" : "") + '<p class="small">' + esc(it.q) + "</p>" + stepsHTML(it));
+    h += tipsHTML(p);
     h += blk("Quand y penser", esc(c.signal || ""));
     h += blk("Piège", '<div class="tip">' + esc(c.trap || "") + "</div>");
     h += blk("Contrôle", esc(c.check || ""));
     return h;
   }
+  function tipsHTML(p) { var t = TP.of(p); if (!t.length) return "";
+    return blk("Astuces de calcul", t.map(function (x) { return '<div class="tipc"><b>' + esc(x.t) + "</b> : " + esc(x.d) + '<div class="small">Ex. ' + esc(x.ex) + (x.book ? " (MathBook " + esc(x.book) + ")" : "") + "</div></div>"; }).join("")); }
   function blk(lbl, inner) { return inner ? '<div class="blk"><div class="lbl">' + esc(lbl) + "</div>" + inner + "</div>" : ""; }
   function stepsHTML(it) { var st = X.stepsOf(it); return '<ol class="steps">' + st.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + "</ol>"; }
   var lessonFrom = "fam";
@@ -311,7 +314,7 @@
     function flash() { var u = $("zone").querySelector(".units"); if (u) { u.style.outline = "2px solid var(--ko)"; setTimeout(function () { u.style.outline = ""; }, 700); } }
     each("#zone .pad button", function (b) { b.onclick = function () { press(b.dataset.k); }; });
     each("#zone .units button", function (b) { b.onclick = function () { unit = b.dataset.u; each("#zone .units button", function (x) { x.classList.toggle("on", x === b); }); paint(); }; });
-    $("hintBtn").onclick = function () { it.hint = true; this.disabled = true; $("hintBox").innerHTML = '<div class="tip"><b>Indice :</b> ' + esc(it.rule || (LS.L[slot.pid].eq || [C[slot.pid].formula]).join(" · ")) + '<br><span class="small">Une réussite avec indice compte, mais pas pour le statut « maîtrisé ».</span></div>'; };
+    $("hintBtn").onclick = function () { it.hint = true; this.disabled = true; $("hintBox").innerHTML = '<div class="tip"><b>Indice :</b> ' + esc(it.rule || (LS.L[slot.pid].eq || [C[slot.pid].formula]).join(" · ")) + (TP.of(slot.pid)[0] ? '<br><b>Astuce :</b> ' + esc(TP.of(slot.pid)[0].t + " : " + TP.of(slot.pid)[0].d) : "") + '<br><span class="small">Une réussite avec indice compte, mais pas pour le statut « maîtrisé ».</span></div>'; };
     $("dunno").onclick = function () { submit(slot, it, null, null, null, true); };
     keyHandler = function (e) {
       if (cur !== "run") return;
@@ -351,6 +354,7 @@
     h += "</div>";
     if (it.rule) h += blk("La règle utilisée ici", "<p>" + esc(it.rule) + "</p>");
     h += blk("Méthode pas à pas", stepsHTML(it));
+    h += tipsHTML(pid);
     h += blk("Formule", (L.eq || [c.formula]).map(function (e) { return '<div class="eq">' + esc(e) + "</div>"; }).join(""));
     h += blk("À quoi ça sert en case", esc(L.use || ""));
     h += blk("Cas d'usage", esc(L.ex || ""));
