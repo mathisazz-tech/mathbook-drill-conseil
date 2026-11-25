@@ -9,6 +9,26 @@
   function def(id, o, lesson, gen) { o.id = id; o.fam = "R"; o.skill = id; if (!o.prio) o.prio = "P0"; if (!o.lvl) o.lvl = "A"; CAT[id] = o; G[id] = gen; LS.L[id] = lesson; }
   function out(o) { o.method = o.steps.join(" | "); if (!o.unit) o.unit = ""; if (!o.tol) o.tol = T.EX; return o; }
 
+  // ---------- techniques de tête réutilisables ----------
+  // n ÷ d en étapes faciles (doubler les deux termes, divisions successives)
+  function divSteps(n, d) {
+    var q = n / d, f = function (x) { return fr(rd(x, 4)); };
+    if (d === 5 || d === 15 || d === 25 || d === 35 || d === 45) return ["Astuce : on double les deux termes, " + f(n) + " ÷ " + d + " = " + f(2 * n) + " ÷ " + 2 * d, f(2 * n) + " ÷ " + 2 * d + " = " + f(q)];
+    var split = { 4: [2, 2], 6: [2, 3], 8: [2, 4], 12: [4, 3], 16: [4, 4], 24: [4, 6] }[d];
+    if (split) return ["Astuce : ÷ " + d + " = ÷ " + split[0] + " puis ÷ " + split[1], f(n) + " ÷ " + split[0] + " = " + f(n / split[0]), f(n / split[0]) + " ÷ " + split[1] + " = " + f(q)];
+    if (d === 10 || d === 20) return [f(n) + " ÷ " + d + " = " + f(q)];
+    return [f(n) + " ÷ " + d + " = " + f(q)];
+  }
+  // x × p % avec p proche de 100 ou fraction simple : on retire la perte au lieu de multiplier
+  function pctSteps(x, p) {
+    var f = function (v, d) { return fr(rd(v, d === undefined ? 3 : d)); }, y = x * p / 100;
+    if (p === 75) return [f(x) + " × 75 % = " + f(x) + " × 3/4 : " + f(x) + " ÷ 4 = " + f(x / 4) + ", × 3 = " + f(y)];
+    if (p === 50) return [f(x) + " × 50 % = moitié = " + f(y)];
+    var loss = 100 - p, l = x * loss / 100;
+    var how = loss === 10 ? "10 % = on décale la virgule" : loss === 5 ? "5 % = moitié de 10 %" : loss === 2 ? "2 % = 2 centièmes" : loss === 20 ? "20 % = un cinquième" : loss === 15 ? "15 % = 10 % + 5 %" : loss === 25 ? "25 % = un quart" : loss + " %";
+    return [f(x) + " × " + p + " % = " + f(x) + " − " + loss + " % (" + how + ") = " + f(x) + " − " + f(l) + " = " + f(y)];
+  }
+
   // ---------- Ch. 1 et 3 : multiplier ----------
   def("R01", { name: "2 chiffres × 1 chiffre, de gauche à droite", book: "§1.1, §3.1", formula: "", signal: "Un nombre à 2 chiffres fois un chiffre : dizaines d'abord, unités ensuite.", trap: "Partir des unités avec des retenues (méthode posée).", check: "Le résultat est entre (dizaine) × k et (dizaine + 10) × k." },
     { use: "Le calcul le plus fréquent en case : 47 magasins × 6, 8 € × 36 k clients. Partir de la gauche donne tout de suite l'ordre de grandeur.", ex: "6 × 47 k€ = 240 + 42 = 282 k€.", eq: ["ab × k = (a0 × k) + (b × k)"] },
@@ -161,9 +181,9 @@
         traps: [{ v: t, code: "E03", msg: "La hausse se calcule sur la base réduite : elle est plus grande que la baisse." }] }); });
   def("R25", { name: "Proportion inverse (règle de trois inverse)", book: "§14.7", lvl: "B", signal: "Plus de machines → moins de jours : on passe par le total (machine-jours).", trap: "Faire une règle de trois directe.", check: "Plus de ressources = moins de temps." },
     { use: "Dimensionner : combien de jours avec plus d'équipes, combien de personnes pour finir plus vite.", ex: "12 personnes en 10 jours → 120 jours-homme ; en 8 jours il faut 15 personnes.", eq: ["Total = ressources × durée", "Nouvelle durée = total ÷ nouvelles ressources"] },
-    function (r) { var a = r.p([6, 8, 10, 12, 4]), d = r.p([20, 15, 12, 30, 24]), tot = a * d, b = r.p([8, 10, 12, 15, 5, 6]); if (b === a) b = a + 2;
+    function (r) { var a = r.p([6, 8, 10, 12, 4]), d = r.p([20, 15, 12, 30, 24]), tot = a * d, bs = [8, 10, 12, 15, 5, 6, 16, 20, 24].filter(function (x) { return x !== a && Math.abs(tot * 10 / x - Math.round(tot * 10 / x)) < 1e-9; }), b = r.p(bs);
       return out({ p: { a: a, d: d, b: b }, q: a + " machines font une commande en " + d + " jours. Combien de jours avec " + b + " machines ?", ans: tot / b, unit: "jours", tol: T.Y01, rule: "Plus de machines, moins de jours : on calcule d'abord le travail total en machine-jours.",
-        steps: [a + " × " + d + " = " + tot + " machine-jours", tot + " ÷ " + b + " = " + fr(tot / b, 2) + " jours"],
+        steps: [a + " × " + d + " = " + tot + " machine-jours"].concat(divSteps(tot, b)).concat(["Durée = " + fr(rd(tot / b, 2)) + " jours"]),
         traps: [{ v: d * b / a, code: "E01", msg: "Règle de trois directe : ici c'est inversement proportionnel." }] }); });
   def("R26", { name: "Enchaîner trois variations", book: "§14.4", lvl: "B", signal: "+10 %, +20 %, −10 % : on multiplie les coefficients (ou on part de 100).", trap: "Additionner les % (+20 %).", check: "La somme simple donne l'ordre de grandeur." },
     { use: "Prix sur plusieurs années, ou prix × volume × mix.", ex: "+10 %, +20 %, −10 % : 100 → 110 → 132 → 118,8, soit +18,8 %.", eq: ["Variation totale = (1 + a) × (1 + b) × (1 + c) − 1"] },
@@ -182,8 +202,8 @@
   def("R28", { name: "Annualiser : flux × 12, taux composé", book: "§16.7", lvl: "B", signal: "Un flux s'additionne (× 12) ; un taux se compose ((1 + r)¹² − 1).", trap: "Multiplier un taux mensuel par 12.", check: "Un taux composé annuel est un peu au-dessus de 12 × le mensuel." },
     { use: "Données mensuelles d'un client à comparer à un objectif annuel ; run rate.", ex: "1 % par mois = 1,01¹² − 1 ≈ 12,7 % par an, pas 12 %.", eq: ["Flux annuel = flux mensuel × 12", "Taux annuel = (1 + taux mensuel)¹² − 1"] },
     function (r) { if (r.f() < 0.5) { var m = r.p([1, 2, 0.5]), a = (Math.pow(1 + m / 100, 12) - 1) * 100;
-        return out({ p: { m: m }, q: "Croissance de " + fr(m) + " % par mois. Croissance sur un an ?", ans: a, unit: "%", tol: T.P05, rule: "Un taux se compose : chaque mois s'applique au total du mois précédent.",
-          steps: ["Coefficient mensuel = " + fr(1 + m / 100, 3), fr(1 + m / 100, 3) + "¹² ≈ " + fr(Math.pow(1 + m / 100, 12), 3), "Croissance ≈ " + fr(a, 1) + " % (un peu plus que 12 × " + fr(m) + " = " + fr(12 * m) + " %)"],
+        return out({ p: { m: m }, q: "Croissance de " + fr(m) + " % par mois. Croissance sur un an ?", ans: a, unit: "%", tol: T.P05, rule: "Un taux se compose : chaque mois s'applique au total du mois précédent. On ne calcule pas 1,01¹² : on prend 12 × le taux, plus une petite correction.",
+          steps: ["Astuce petit taux composé : croissance ≈ n × r + (n × (n − 1) ÷ 2) × r²", "Premier terme : 12 × " + fr(m) + " % = " + fr(12 * m) + " %", "Correction : 12 × 11 ÷ 2 = 66 paires de mois ; 66 × (" + fr(m) + " %)² = 66 × " + fr(rd(m * m / 100, 4)) + " % = " + fr(rd(0.66 * m * m, 2)) + " point", fr(12 * m) + " + " + fr(rd(0.66 * m * m, 2)) + " ≈ " + fr(rd(12 * m + 0.66 * m * m, 1)) + " % (exact " + fr(a, 2) + " %)"],
           traps: [{ v: 12 * m, code: "E04", msg: "Un taux mensuel se compose, il ne se multiplie pas par 12." }] }); }
       var mo = r.p([1.5, 2.5, 3, 4.2, 0.8]);
       return out({ p: { mo: mo }, q: "CA de décembre : " + fr(mo) + " M€. Run rate annuel ?", ans: rd(mo * 12, 6), unit: "M€", rule: "Un flux mensuel s'annualise en multipliant par 12 (attention si le mois est saisonnier).",
@@ -193,8 +213,8 @@
   def("R29", { name: "TRS : disponibilité × performance × qualité", book: "§17.2", lvl: "B", signal: "Trois taux de perte se multiplient.", trap: "Les additionner ou en faire la moyenne.", check: "Le TRS est plus bas que chacun des trois taux." },
     { use: "« Où perd-on de la capacité ? » dans une usine : on chiffre chaque perte.", ex: "90 % × 80 % × 95 % = 68,4 %.", eq: ["TRS = disponibilité × performance × qualité"] },
     function (r) { var a = r.p([80, 85, 90, 95]), b = r.p([75, 80, 85, 90]), c = r.p([90, 95, 98]), t = a * b * c / 1e4;
-      return out({ p: { a: a, b: b, c: c }, q: "Disponibilité " + a + " %, performance " + b + " %, qualité " + c + " %. TRS ?", ans: t, unit: "%", tol: T.P02, rule: "Les trois pertes s'enchaînent, donc les taux se multiplient.",
-        steps: [fr(a / 100) + " × " + fr(b / 100) + " = " + fr(a * b / 1e4, 3), fr(a * b / 1e4, 3) + " × " + fr(c / 100) + " = " + fr(t / 100, 3), "TRS = " + fr(t, 1) + " %"],
+      return out({ p: { a: a, b: b, c: c }, q: "Disponibilité " + a + " %, performance " + b + " %, qualité " + c + " %. TRS ?", ans: t, unit: "%", tol: T.P05, rule: "Les trois pertes s'enchaînent, donc les taux se multiplient. De tête, on part de " + a + " % et on retire chaque perte au lieu de multiplier des décimales.",
+        steps: ["On part de " + a + " %"].concat(pctSteps(a, b)).concat(pctSteps(a * b / 100, c)).concat(["TRS ≈ " + fr(rd(t, 1)) + " %"]),
         traps: [{ v: (a + b + c) / 3, code: "E04", msg: "Moyenne des taux : les pertes s'enchaînent, il faut multiplier." }] }); });
   def("R30", { name: "TAM, SAM, SOM", book: "§18.5", lvl: "B", signal: "Marché total → partie adressable par l'offre → part atteignable.", trap: "Appliquer la part visée au TAM au lieu du SAM.", check: "SOM < SAM < TAM." },
     { use: "Après le sizing : « Quelle part peut viser le client ? »", ex: "TAM 2 Md€, 30 % adressable, 10 % de part visée : SOM = 60 M€.", eq: ["SAM = TAM × % adressable", "SOM = SAM × part visée"] },

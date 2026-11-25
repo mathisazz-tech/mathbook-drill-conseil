@@ -25,23 +25,25 @@ var TIPS = (function () {
     ACT: { t: "Facteurs d'actualisation à 10 %", d: "Pour actualiser sans calculer de puissance.", ex: "1/1,1 ≈ 0,91 · 1/1,1² ≈ 0,83 · 1/1,1³ ≈ 0,75 · 1/1,1⁵ ≈ 0,62." },
     ROUND: { t: "Arrondir, puis dire dans quel sens", d: "Arrondis pour calculer vite, puis précise si le vrai résultat est au-dessus ou en dessous.", ex: "19,8 × 51 ≈ 20 × 50 = 1 000 (exact 1 009,8).", book: "§5" },
     RULE3: { t: "Règle de trois inverse", d: "Plus de ressources, moins de temps : le produit ressources × temps reste constant.", ex: "6 équipes en 10 jours = 60 équipes-jours ; avec 4 équipes : 15 jours.", book: "§14.7" },
+    OFF: { t: "Multiplier par un % proche de 100", d: "× 98 % = retirer 2 % ; × 95 % = retirer 5 % (moitié de 10 %) ; × 90 % = retirer 10 % ; × 75 % = × 3/4.", ex: "85 × 75 % = 85 × 3/4 = 63,75 ; puis × 98 % : 63,75 − 1,28 ≈ 62,5." },
+    SMALLC: { t: "Petit taux composé", d: "(1 + r)ⁿ − 1 ≈ n × r + (n × (n − 1) ÷ 2) × r². Le 2ᵉ terme est une petite correction.", ex: "1 % par mois sur 12 mois : 12 % + 66 × 0,01 % = 12,66 ≈ 12,7 %." },
     UNIT: { t: "Marge unitaire d'abord", d: "Pour un point mort ou un seuil, calcule d'abord ce que rapporte une unité, puis divise.", ex: "Fixes 600 k€, prix 50 €, variable 30 € : 600 k ÷ 20 = 30 k unités." }
   };
   var M = {
     M01: ["COMP", "ROUND"], M02: ["X25", "ROUND"], M03: ["X25", "FRAC"], M04: ["MORC", "DBL", "FRAC"], M05: ["FRAC", "PCT"], M06: ["ZERO", "MDM"],
-    M07: ["PTS"], M08: ["CROSS", "INV"], M09: ["DBL", "MORC"], M10: ["ROUND"], M11: ["R72", "REP", "JET"],
+    M07: ["PTS"], M08: ["CROSS", "INV"], M09: ["DBL", "MORC"], M10: ["ROUND"], M11: ["R72", "REP", "SMALLC", "JET"],
     C01: ["ZERO", "PCT", "ROUND"], C02: ["ZERO", "ANN"], C03: ["ZERO", "MORC"], C04: ["ZERO", "X25"], C05: ["FRAC", "PCT"], C06: ["MID", "PTS"],
-    C07: ["CHAIN", "PCT"], C08: ["R72", "REP", "JET", "RATIO"], C09: ["CROSS"], C10: ["CHAIN", "ANN"], C11: ["PCT", "ZERO"], C12: ["DIVT", "PCT"],
+    C07: ["CHAIN", "PCT", "OFF"], C08: ["R72", "REP", "JET", "RATIO"], C09: ["CROSS"], C10: ["CHAIN", "SMALLC", "ANN"], C11: ["PCT", "ZERO"], C12: ["DIVT", "PCT"],
     C13: ["PTS", "PCT"], C14: ["PTS", "UNIT"], C15: ["INV", "FRAC"], C16: ["UNIT", "MORC", "DBL"], C17: ["UNIT", "FRAC"], C18: ["CROSS", "PCT"],
-    C19: ["PTS", "CROSS"], C20: ["ANN", "CHAIN"], C21: ["CHAIN"], C22: ["RULE3", "ANN"], C23: ["UNIT", "MORC"], C24: ["RULE3", "ANN"],
-    C25: ["CHAIN", "INV"], C26: ["MORC"], C27: ["PCT"], C28: ["ANN", "FRAC"], C29: ["PTS"], C30: ["COMP"], C31: ["DIVT", "ACT"],
+    C19: ["PTS", "CROSS"], C20: ["ANN", "CHAIN"], C21: ["CHAIN", "OFF"], C22: ["RULE3", "ANN"], C23: ["UNIT", "MORC"], C24: ["RULE3", "ANN"],
+    C25: ["CHAIN", "OFF", "INV"], C26: ["MORC"], C27: ["PCT"], C28: ["ANN", "FRAC"], C29: ["PTS"], C30: ["COMP"], C31: ["DIVT", "ACT"],
     C32: ["ZERO", "X25"], C33: ["DIVT", "R72"], C34: ["PCT", "MID"], C35: ["UNIT", "MORC"], C36: ["PCT", "ZERO"], C37: ["ROUND", "ZERO"],
     D01: ["ZERO"], D02: ["ZERO"], D03: ["DIVT", "ZERO"], D04: ["MID"], D05: ["PCT", "INV"], D06: ["MID"], D07: ["DIVT"], D08: ["DIVT"],
     D09: ["PTS"], D10: ["DIVT", "ACT"], D11: ["PTS"], D12: ["DIVT", "ACT"], D13: ["MID"], D14: ["PCT", "PTS"], D15: ["R72", "REP", "JET"],
     D16: ["ZERO"], D17: ["ZERO", "X25"], D18: ["R72", "REP", "ACT"], D19: ["MORC"], D20: ["MORC", "ZERO"], D21: ["COMP"], D22: ["FRAC"], D23: ["PCT"],
     S01: ["MID", "ANN"], S02: ["ANN"], S03: ["ZERO"], S04: ["PTS", "PCT"], S05: ["PTS", "ANN"], S06: ["CHAIN"], S07: ["PTS"], S08: ["DIVT", "ANN"], S09: ["CROSS", "INV"],
-    R11: ["ZERO"], R17: ["DBL"], R18: ["MORC"], R20: ["FRAC"], R21: ["PCT"], R22: ["MDM", "ZERO"], R23: ["PTS"], R24: ["INV"], R25: ["RULE3"],
-    R26: ["CROSS"], R28: ["ANN", "R72"], R29: ["CHAIN"], R31: ["DIVT"], R33: ["FRAC", "REP"], R34: ["R72", "REP", "JET"]
+    R11: ["ZERO"], R17: ["DBL"], R18: ["MORC"], R20: ["FRAC"], R21: ["PCT"], R22: ["MDM", "ZERO"], R23: ["PTS"], R24: ["INV"], R25: ["DBL", "MORC"],
+    R26: ["CROSS"], R28: ["SMALLC", "ANN", "R72"], R29: ["OFF", "CHAIN"], R31: ["DIVT"], R33: ["FRAC", "REP"], R34: ["R72", "REP", "JET"]
   };
   function of(pid) { return (M[pid] || []).map(function (k) { return T[k]; }).filter(Boolean); }
   return { T: T, MAP: M, of: of };
