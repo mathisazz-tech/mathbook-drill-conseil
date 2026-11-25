@@ -78,7 +78,10 @@ var DRILL = (function () {
       if (Math.abs(R - 2) <= 0.06) st.push("Raccourci pour un doublement : règle de 72, 72 ÷ " + n + " ≈ " + fr(Math.round(72 / n * 10) / 10, 1) + " %");
       return { rule: "On ne calcule pas une racine " + ({ 2: "carrée", 3: "cubique", 4: "quatrième", 5: "cinquième" }[n] || n + "-ième") + " de tête : on cherche quel taux, composé " + n + " fois, donne le ratio, avec les repères (1 + g)" + pw(n) + ".", steps: st };
     }
-    return { powSteps: powSteps, root: root, c2: c2 };
+    function df(r, n) { return Math.round(100 / Math.pow(1 + r / 100, n)) / 100; }
+    function dfLine(r, n) { var o = []; for (var i = 1; i <= n; i++) o.push("année " + i + " ≈ " + c2(df(r, i))); return "Facteurs d'actualisation à " + r + " % (repères) : " + o.join(" · "); }
+    function invRate(k) { var m = Math.round(10000 / k) / 100; return "÷ " + fr(k) + " % = × 100/" + fr(k) + " ≈ × " + fr(m); }
+    return { powSteps: powSteps, root: root, c2: c2, df: df, dfLine: dfLine, invRate: invRate, pw: pw };
   })();
 
   // ---------- bibliothèque financière (oracle unique, testée sur les exemples du référentiel) ----------
@@ -531,11 +534,17 @@ var DRILL = (function () {
   };
   G.C31 = function (r) {
     if (r.f() < 0.5) { var cf = r.p([2, 3, 4, 5]), rr = r.p([8, 10, 12]), g = r.p([0, 2, 3]);
-      return { p: { cf: cf, r: rr, g: g }, q: "Flux de " + cf + " M€ dans un an, croissant de " + g + " % par an à perpétuité ; taux d'actualisation " + rr + " %. Valeur ?", ans: FIN.gordon(cf, rr / 100, g / 100), unit: "M€", tol: T.R05,
+      var kk = rr - g, gv = FIN.gordon(cf, rr / 100, g / 100);
+      return { p: { cf: cf, r: rr, g: g }, q: "Flux de " + cf + " M€ dans un an, croissant de " + g + " % par an à perpétuité ; taux d'actualisation " + rr + " %. Valeur ?", ans: gv, unit: "M€", tol: T.R1,
+        rule: "Perpétuité croissante : flux ÷ (taux − croissance). Diviser par un petit % revient à multiplier par son inverse.",
+        steps: [rr + " % − " + g + " % = " + kk + " %", MENTAL.invRate(kk), cf + " × " + fr(Math.round(10000 / kk) / 100) + " ≈ " + fr(Math.round(cf * 10000 / kk) / 100) + " M€"],
         method: cf + " ÷ (" + rr + " % − " + g + " %) = " + fr(FIN.gordon(cf, rr / 100, g / 100), 2) + " M€" }; }
     var I = r.p([10, 20]), c1 = r.p([5, 6, 8]), c2 = r.p([8, 10]), c3 = r.p([8, 10, 12]), rr2 = r.p([10, 12]);
     var v = FIN.npv(rr2 / 100, [-I, c1, c2, c3]);
-    return { p: { I: I, c: [c1, c2, c3], r: rr2 }, q: "Investissement " + I + " M€ ; flux " + c1 + ", " + c2 + ", " + c3 + " M€ sur 3 ans ; taux " + rr2 + " %. VAN ?", ans: v, unit: "M€", tol: { abs: 0.1, rel: 0.01, label: "±1 % ou ±0,1 M€" },
+    var f1 = MENTAL.df(rr2, 1), f2 = MENTAL.df(rr2, 2), f3 = MENTAL.df(rr2, 3), vm = -I + c1 * f1 + c2 * f2 + c3 * f3;
+    return { p: { I: I, c: [c1, c2, c3], r: rr2 }, q: "Investissement " + I + " M€ ; flux " + c1 + ", " + c2 + ", " + c3 + " M€ sur 3 ans ; taux " + rr2 + " %. VAN ?", ans: v, unit: "M€", tol: { abs: 0.3, label: "±0,3 M€" },
+      rule: "On n'élève rien au carré : chaque flux est multiplié par un facteur d'actualisation à connaître.",
+      steps: [MENTAL.dfLine(rr2, 3), c1 + " × " + MENTAL.c2(f1) + " ≈ " + MENTAL.c2(c1 * f1) + " ; " + c2 + " × " + MENTAL.c2(f2) + " ≈ " + MENTAL.c2(c2 * f2) + " ; " + c3 + " × " + MENTAL.c2(f3) + " ≈ " + MENTAL.c2(c3 * f3), "Somme des flux actualisés ≈ " + MENTAL.c2(vm + I) + " ; VAN ≈ " + MENTAL.c2(vm + I) + " − " + I + " ≈ " + MENTAL.c2(vm) + " M€ (exact " + fr(v, 2) + ")"],
       method: "−" + I + " + " + c1 + "/" + fr(1 + rr2 / 100) + " + " + c2 + "/" + fr(Math.pow(1 + rr2 / 100, 2), 4) + " + " + c3 + "/" + fr(Math.pow(1 + rr2 / 100, 3), 4) + " = " + fr(v, 2) + " M€" };
   };
   G.C32 = function (r) {
@@ -643,7 +652,9 @@ var DRILL = (function () {
     var ev = c1 / (1 + w / 100) + (c2 + tv) / Math.pow(1 + w / 100, 2);
     var askEq = r.f() < 0.5;
     return { p: { c1: c1, c2: c2, tv: tv, w: w, nd: nd }, q: "FCFF année 1 : " + c1 + " M€ ; année 2 : " + c2 + " M€ ; valeur terminale fin d'année 2 : " + tv + " M€ ; WACC " + w + " %." + (askEq ? " Dette nette " + nd + " M€. Equity ?" : " EV ?"),
-      ans: askEq ? ev - nd : ev, unit: "M€", tol: { abs: 0.1, rel: 0.005, label: "±0,5 % ou ±0,1 M€" },
+      ans: askEq ? ev - nd : ev, unit: "M€", tol: T.R1,
+      rule: "On n'élève rien au carré : on multiplie chaque flux par son facteur d'actualisation, et la valeur terminale est actualisée avec le flux de la même année.",
+      steps: (function () { var a1 = MENTAL.df(w, 1), a2 = MENTAL.df(w, 2), v1 = c1 * a1, v2 = (c2 + tv) * a2, st = [MENTAL.dfLine(w, 2), "Année 1 : " + c1 + " × " + MENTAL.c2(a1) + " ≈ " + fr(Math.round(v1 * 10) / 10), "Année 2 : (" + c2 + " + " + tv + ") × " + MENTAL.c2(a2) + " = " + (c2 + tv) + " × " + MENTAL.c2(a2) + " ≈ " + fr(Math.round(v2 * 10) / 10), "EV ≈ " + fr(Math.round((v1 + v2) * 10) / 10) + " M€ (exact " + fr(ev, 1) + ")"]; if (askEq) st.push("Equity ≈ EV − dette nette ≈ " + fr(Math.round((v1 + v2 - nd) * 10) / 10) + " M€"); return st; })(),
       method: c1 + "/" + fr(1 + w / 100) + " + (" + c2 + " + " + tv + ")/" + fr(Math.pow(1 + w / 100, 2), 4) + " = " + fr(ev, 2) + " M€" + (askEq ? " ; − " + nd + " = " + fr(ev - nd, 2) + " M€" : ""),
       traps: [{ v: c1 / (1 + w / 100) + c2 / Math.pow(1 + w / 100, 2) + tv, code: "E01", msg: "La valeur terminale doit être actualisée." }] };
   };
@@ -693,7 +704,10 @@ var DRILL = (function () {
   G.D18 = function (r) {
     var pro = r.p([100, 115, 150]), irr = r.p([15, 20, 25]), n = r.p([4, 5]);
     var eq = pro / Math.pow(1 + irr / 100, n);
-    return { p: { pro: pro, irr: irr, n: n }, q: "Produits de sortie attendus " + pro + " M€ dans " + n + " ans, TRI cible " + irr + " %, sans flux intermédiaires. Equity maximum à investir ?", ans: eq, unit: "M€", tol: T.R1,
+    var cm = Math.round(Math.pow(1 + irr / 100, n) * 100) / 100;
+    return { p: { pro: pro, irr: irr, n: n }, q: "Produits de sortie attendus " + pro + " M€ dans " + n + " ans, TRI cible " + irr + " %, sans flux intermédiaires. Equity maximum à investir ?", ans: eq, unit: "M€", tol: T.R2,
+      rule: "L'equity investie doit être multipliée par (1 + TRI)ⁿ pour atteindre la sortie : on divise la sortie par ce multiple, pris dans les repères.",
+      steps: [fr(1 + irr / 100) + MENTAL.pw(n) + " ≈ " + MENTAL.c2(cm) + " (repère : c'est le MOIC exigé)", pro + " ÷ " + MENTAL.c2(cm) + " ≈ " + fr(Math.round(pro / cm)) + " M€"],
       method: pro + " ÷ " + fr(1 + irr / 100) + "^" + n + " = " + pro + " ÷ " + fr(Math.pow(1 + irr / 100, n), 3) + " = " + fr(eq, 2) + " M€" };
   };
   G.D19 = function (r) {
